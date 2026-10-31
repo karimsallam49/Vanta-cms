@@ -107,32 +107,54 @@
   </div>
 </form>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
+<script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
 <script>
 (function () {
   const latIn = document.getElementById('latitude');
   const lngIn = document.getElementById('longitude');
   const addrIn = document.getElementById('address');
+  const mapEl = document.getElementById('map-pick');
+
+  if (typeof L === 'undefined') {
+    mapEl.innerHTML = '<div class="hint" style="padding:1rem">Map failed to load — enter latitude/longitude manually below.</div>';
+    return;
+  }
+
   const start = (latIn.value && lngIn.value)
     ? [parseFloat(latIn.value), parseFloat(lngIn.value)]
     : [25.2, 55.3]; // Gulf default
 
-  // Fix default marker icon when assets come from CDN
+  // Fix default marker icon — assets are vendored locally
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconRetinaUrl: '{{ asset('vendor/leaflet/images/marker-icon-2x.png') }}',
+    iconUrl: '{{ asset('vendor/leaflet/images/marker-icon.png') }}',
+    shadowUrl: '{{ asset('vendor/leaflet/images/marker-shadow.png') }}',
   });
 
   const map = L.map('map-pick').setView(start, latIn.value ? 14 : 8);
 
-  // CartoDB dark tiles — free, no API key. Matches the CMS theme.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
-    subdomains: 'abcd', maxZoom: 19,
+  // Esri dark-grey basemap + label overlay — free, no API key, dark theme.
+  // (CartoDB basemaps started requiring a key — do not switch back.)
+  const esri = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/';
+  const tiles = L.tileLayer(esri + 'World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+    maxZoom: 16,
   }).addTo(map);
+  const labels = L.tileLayer(esri + 'World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 16,
+  }).addTo(map);
+  let tilesFailed = false;
+  tiles.on('tileerror', () => {
+    if (tilesFailed) return;
+    tilesFailed = true;
+    map.removeLayer(tiles);
+    map.removeLayer(labels);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap', maxZoom: 19,
+    }).addTo(map);
+  });
 
   let marker = null;
 

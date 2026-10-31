@@ -3,6 +3,10 @@
 > Fictional multi-brand motorcycle group CMS, built for a technical assessment.
 > Companion backend for the **vanta-moto** React frontend. All data is fictional
 > and for demonstration only — not affiliated with any real motorcycle brand.
+>
+> This project is created solely for recruitment assessment and demonstration
+> purposes and is not intended for commercial use. All trademarks, brand names
+> and third-party assets remain the property of their respective owners.
 
 ## Stack
 
@@ -32,6 +36,7 @@ Open http://127.0.0.1:8000 → redirects to `/admin` → login screen.
 | **Data Entry** (custom role) | `data@vantamoto.com` | `VantaEntry2026` | VOLTA + NOMAD brands only |
 
 > Credentials are development seed data — replace before any real deployment.
+> Also listed in [`CREDENTIALS.md`](CREDENTIALS.md).
 
 ## Features
 
@@ -48,7 +53,7 @@ Open http://127.0.0.1:8000 → redirects to `/admin` → login screen.
   brands, enforced at three layers: list scope (`visibleTo`), policies
   (per-entity `brand_id` check), and `FormRequest::authorize()`
 - **CRUD** — brands, motorcycles (bilingual, gallery with per-image colors,
-  inventory, showroom assignment), offers (group/brand/model/test-ride
+  custom spec table + feature tags, inventory, showroom assignment), offers (group/brand/model/test-ride
   scopes + discount %), showrooms (map pin, hours, test-ride open days),
   currencies, staff, roles
 - **Bulk import/export** — Excel/CSV for brands & motorcycles with blank
