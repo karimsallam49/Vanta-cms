@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Enums\TestRideStatus;
+use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TestRideRequest extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'motorcycle_id',
         'showroom_id',
@@ -50,5 +53,10 @@ class TestRideRequest extends Model
         return $query->whereHas('motorcycle', function (Builder $q) use ($user) {
             $q->whereIn('brand_id', $user->accessibleBrandIds());
         });
+    }
+
+    public function activityTitle(): string
+    {
+        return $this->name.' — '.($this->motorcycle?->name ?? 'ride');
     }
 }

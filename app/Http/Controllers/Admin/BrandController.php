@@ -6,15 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BrandRequest;
 use App\Models\Brand;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BrandController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $brands = Brand::withCount(['motorcycles', 'offers'])
+        $brands = Brand::withCount([
+                'motorcycles',
+                'offers',
+                'users',
+                'testRideRequests as pending_rides_count' => fn ($q) => $q->where('status', 'pending'),
+            ])
+            ->when($request->filled('q'), fn ($q) => $q->where(fn ($qq) => $qq
+                ->where('name', 'like', "%{$request->q}%")
+                ->orWhere('name_ar', 'like', "%{$request->q}%")
+                ->orWhere('origin', 'like', "%{$request->q}%")))
+            ->when($request->filled('segment'), fn ($q) => $q->where('segment', $request->string('segment')))
             ->orderBy('name')
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
         return view('brands.index', compact('brands'));
     }

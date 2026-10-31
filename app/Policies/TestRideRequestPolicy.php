@@ -9,12 +9,13 @@ class TestRideRequestPolicy
 {
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasPermission('test-rides.view');
     }
 
     public function view(User $user, TestRideRequest $request): bool
     {
-        return $user->canAccessBrand($request->motorcycle->brand_id);
+        return $user->hasPermission('test-rides.view')
+            && $user->canAccessBrand($request->motorcycle->brand_id);
     }
 
     /**
@@ -23,6 +24,7 @@ class TestRideRequestPolicy
      */
     public function update(User $user, TestRideRequest $request): bool
     {
-        return $user->canAccessBrand($request->motorcycle->brand_id);
+        return $user->hasPermission('test-rides.edit')
+            && $user->canAccessBrand($request->motorcycle->brand_id);
     }
 }

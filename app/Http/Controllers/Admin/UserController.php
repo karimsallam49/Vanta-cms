@@ -5,19 +5,32 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use App\Models\Brand;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    // Routes wrapped in `admin` middleware — only admins manage staff.
+    // Routes wrapped in `perm:staff` — accounts need the permission
+    // plus an admin role to touch another admin.
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $users = User::with('brands')->orderBy('name')->paginate(15);
+        $users = User::with('brands', 'role')
+            ->when($request->filled('q'), fn ($q) => $q->where(fn ($qq) => $qq
+                ->where('name', 'like', "%{$request->q}%")
+                ->orWhere('email', 'like', "%{$request->q}%")))
+            ->when($request->filled('role_id'), fn ($q) => $q->where('role_id', $request->integer('role_id')))
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('users.index', compact('users'));
+        return view('users.index', [
+            'users' => $users,
+            'roles' => Role::orderBy('name')->pluck('name', 'id'),
+        ]);
     }
 
     public function create(): View
@@ -25,6 +38,7 @@ class UserController extends Controller
         return view('users.form', [
             'user' => new User(),
             'brands' => Brand::orderBy('name')->get(),
+            'roles' => Role::orderBy('name')->get(),
         ]);
     }
 
@@ -44,6 +58,7 @@ class UserController extends Controller
         return view('users.form', [
             'user' => $user,
             'brands' => Brand::orderBy('name')->get(),
+            'roles' => Role::orderBy('name')->get(),
         ]);
     }
 

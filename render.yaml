@@ -1,0 +1,19 @@
+# Render blueprint — https://render.com/deploy
+# Free web service sleeps after ~15 min idle (cold start ~30-60s).
+services:
+  - type: web
+    name: vanta-cms
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/showrooms
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL          # https://vanta-cms.onrender.com — set after first deploy
+        sync: false
+      - key: APP_KEY          # php artisan key:generate --show
+        sync: false
+      - key: MAIL_MAILER      # keep log — no real SMTP needed for the demo
+        value: log

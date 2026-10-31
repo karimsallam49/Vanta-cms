@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\UserRole;
+use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,13 +12,14 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, LogsActivity, Notifiable;
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
+        'locale',
     ];
 
     protected $hidden = [
@@ -30,25 +32,42 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'role' => UserRole::class,
         ];
     }
 
     /* ---------- Relations ---------- */
 
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
     /**
-     * Brands this user is allowed to manage (data-entry role only).
+     * Brands this user is allowed to manage — applies to any non-admin
+     * role touching brand-scoped content.
      */
     public function brands(): BelongsToMany
     {
         return $this->belongsToMany(Brand::class, 'user_brand')->withTimestamps();
     }
 
-    /* ---------- Role helpers ---------- */
+    /* ---------- Access helpers ---------- */
 
     public function isAdmin(): bool
     {
-        return $this->role === UserRole::Admin;
+        return $this->role?->is_admin ?? false;
+    }
+
+    /**
+     * RBAC check — "motorcycles.edit". Admin roles bypass every check.
+     */
+    public function hasPermission(string $permission): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return in_array($permission, $this->role?->permissions ?? [], true);
     }
 
     /**
@@ -65,5 +84,10 @@ class User extends Authenticatable
     public function canAccessBrand(?int $brandId): bool
     {
         return $brandId !== null && in_array($brandId, $this->accessibleBrandIds(), true);
+    }
+
+    public function activityTitle(): string
+    {
+        return $this->name;
     }
 }

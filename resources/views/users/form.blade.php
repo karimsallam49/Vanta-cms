@@ -29,13 +29,17 @@
       @error('email')<span class="err">{{ $message }}</span>@enderror
     </div>
 
-    <div class="field {{ $errors->has('role') ? 'has-error' : '' }}">
-      <label for="role">ROLE <span class="req">*</span></label>
-      <select class="select" id="role" name="role" required>
-        <option value="admin" @selected(old('role', $user->role?->value) === 'admin')>Administrator — manages everything</option>
-        <option value="data_entry" @selected(old('role', $user->role?->value, 'data_entry') === 'data_entry')>Data Entry — assigned brands only</option>
+    <div class="field {{ $errors->has('role_id') ? 'has-error' : '' }}">
+      <label for="role_id">ROLE <span class="req">*</span></label>
+      <select class="select" id="role_id" name="role_id" required>
+        @foreach($roles as $r)
+          <option value="{{ $r->id }}" @selected((string) old('role_id', $user->role_id) === (string) $r->id)>
+            {{ $r->name }}{{ $r->is_admin ? ' — full access' : '' }}
+          </option>
+        @endforeach
       </select>
-      @error('role')<span class="err">{{ $message }}</span>@enderror
+      <span class="hint" id="role-hint">{{ $roles->firstWhere('id', old('role_id', $user->role_id))?->description ?? __('Pick what this account can reach under Access control → Roles.') }}</span>
+      @error('role_id')<span class="err">{{ $message }}</span>@enderror
     </div>
 
     <div class="field {{ $errors->has('password') ? 'has-error' : '' }}">
@@ -54,7 +58,7 @@
 
     <div class="field full {{ $errors->has('brands') ? 'has-error' : '' }}">
       <label>ASSIGNED BRANDS <span class="req" id="brands-req">*</span></label>
-      <span class="hint" style="margin-bottom:0.5rem">Data-entry users can only manage content for these brands. Admins ignore this.</span>
+      <span class="hint" style="margin-bottom:0.5rem">{{ __('Brand-scoped roles only manage these brands. Administrator roles ignore this.') }}</span>
       <div class="check-grid">
         @php $assigned = old('brands', $user->exists ? $user->brands->pluck('id')->all() : []); @endphp
         @foreach($brands as $b)
@@ -73,4 +77,12 @@
     <button class="btn btn-primary" type="submit">{{ $user->exists ? 'Save changes' : 'Create account' }}</button>
   </div>
 </form>
+
+<script>
+  // Show the chosen role's description under the select.
+  const roleMeta = @json($roles->mapWithKeys(fn ($r) => [$r->id => $r->description ?? ($r->is_admin ? 'Full access to every section.' : '')]));
+  const roleSel = document.getElementById('role_id');
+  const roleHint = document.getElementById('role-hint');
+  roleSel?.addEventListener('change', () => { roleHint.textContent = roleMeta[roleSel.value] || ''; });
+</script>
 @endsection

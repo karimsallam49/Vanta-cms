@@ -8,7 +8,9 @@ class ShowroomRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isAdmin() ?? false;
+        $action = $this->route('showroom') ? 'edit' : 'create';
+
+        return $this->user()?->hasPermission("showrooms.{$action}") ?? false;
     }
 
     public function rules(): array
@@ -20,6 +22,10 @@ class ShowroomRequest extends FormRequest
             'address' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:40'],
             'hours' => ['nullable', 'string', 'max:120'],
+            'open_days' => ['nullable', 'array', 'min:1'],
+            'open_days.*' => ['integer', 'between:0,6'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'is_service_center' => ['boolean'],
         ];
     }

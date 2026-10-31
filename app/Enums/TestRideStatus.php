@@ -23,12 +23,14 @@ enum TestRideStatus: string
 
     public function tone(): string
     {
+        // One accent color means "act on this", green means "settled",
+        // neutral smoke is passive history.
         return match ($this) {
-            self::Pending => 'amber',
-            self::Contacted => 'sky',
+            self::Pending => 'red',
+            self::Contacted => '',
             self::Confirmed => 'lime',
-            self::Completed => 'green',
-            self::Cancelled => 'red',
+            self::Completed => 'lime',
+            self::Cancelled => '',
         };
     }
 }

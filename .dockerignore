@@ -1,0 +1,15 @@
+.git
+vendor
+node_modules
+.env
+database/database.sqlite
+storage/app/private
+storage/app/public/*
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+storage/logs
+tests
+docs
+Dockerfile
+.dockerignore
