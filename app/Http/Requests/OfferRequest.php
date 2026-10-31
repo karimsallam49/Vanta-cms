@@ -54,6 +54,8 @@ class OfferRequest extends FormRequest
             ],
             'title' => ['required', 'string', 'max:140'],
             'description' => ['required', 'string', 'max:2000'],
+            'image' => ['nullable', 'mimes:jpg,jpeg,png,webp,avif', 'max:4096'],
+            'remove_image' => ['boolean'],
             'badge' => ['nullable', 'string', 'max:40'],
             'discount_percent' => ['nullable', 'integer', 'min:1', 'max:100'],
             'expires_on' => ['nullable', 'date', 'after_or_equal:today'],
@@ -84,6 +86,7 @@ class OfferRequest extends FormRequest
             'motorcycle_id' => $motorcycleId,
             'discount_percent' => $this->input('discount_percent') ?: null,
             'is_active' => $this->boolean('is_active'),
+            'remove_image' => $this->boolean('remove_image'),
         ]);
     }
 }

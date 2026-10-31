@@ -12,7 +12,7 @@
   <a class="btn btn-ghost" href="{{ route('admin.offers.index') }}">← Back</a>
 </div>
 
-<form class="form-shell form-split" method="POST" action="{{ $offer->exists ? route('admin.offers.update', $offer) : route('admin.offers.store') }}">
+<form class="form-shell form-split" method="POST" enctype="multipart/form-data" action="{{ $offer->exists ? route('admin.offers.update', $offer) : route('admin.offers.store') }}">
   @csrf
   @if($offer->exists) @method('PUT') @endif
 
@@ -97,6 +97,27 @@
         </div>
 
         <span class="hint" id="scope-hint"></span>
+      </div>
+    </div>
+
+    <div class="card form-section">
+      <div class="card-head"><h3>Card image</h3></div>
+      <div class="section-body">
+        @if($offer->imageUrl())
+          <div style="margin-bottom:0.8rem">
+            <img src="{{ $offer->imageUrl() }}" alt="" style="width:100%;border-radius:8px;border:1px solid var(--hairline);display:block">
+          </div>
+          <div class="checkbox-row" style="margin-bottom:0.8rem">
+            <input type="checkbox" id="remove_image" name="remove_image" value="1" @checked(old('remove_image'))>
+            <label for="remove_image">{{ __('Remove current image') }}</label>
+          </div>
+        @endif
+        <div class="field {{ $errors->has('image') ? 'has-error' : '' }}">
+          <label for="image">{{ $offer->imageUrl() ? __('REPLACE') : __('UPLOAD') }}</label>
+          <input class="input" id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp">
+          <span class="hint">{{ __('JPG, PNG or WebP — up to 4 MB. Shown as the offer card background on the website.') }}</span>
+          @error('image')<span class="err">{{ $message }}</span>@enderror
+        </div>
       </div>
     </div>
 

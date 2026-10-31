@@ -105,6 +105,7 @@ erDiagram
         string scope "group | brand | model | test_ride"
         string title
         text description
+        string image "nullable — card background"
         string badge
         int discount_percent "nullable"
         date expires_on

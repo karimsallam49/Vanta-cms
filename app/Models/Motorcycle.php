@@ -25,6 +25,7 @@ class Motorcycle extends Model
         'power_hp',
         'weight_kg',
         'top_speed_kmh',
+        'specs',
         'tagline',
         'tagline_ar',
         'description',
@@ -32,6 +33,7 @@ class Motorcycle extends Model
         'currency_id',
         'image',
         'colors',
+        'features',
         'is_active',
         'quantity',
     ];
@@ -40,6 +42,8 @@ class Motorcycle extends Model
     {
         return [
             'colors' => 'array',
+            'specs' => 'array',
+            'features' => 'array',
             'is_active' => 'boolean',
             'quantity' => 'integer',
         ];

@@ -986,3 +986,139 @@ input, select, textarea { font: inherit; color: inherit; }
 }
 .tl-body { min-width: 0; }
 .tl-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.2rem; }
+
+/* ============================================================
+   Professional calibration
+   Calms the arcade chrome: body type for controls, tight
+   tracking, title-cased headings. Accent stays for meaning
+   (primary actions, active states) not decoration.
+   ============================================================ */
+
+.btn {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  height: 2.35rem;
+  padding: 0 1.1rem;
+  border-radius: 7px;
+}
+.btn-sm { height: 1.95rem; padding: 0 0.75rem; font-size: 0.74rem; letter-spacing: 0.01em; }
+.btn-primary { box-shadow: 0 1px 0 rgba(0,0,0,0.25); }
+.btn:focus-visible { outline: 2px solid rgba(255,59,48,0.55); outline-offset: 2px; }
+
+.page-title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0;
+  text-transform: capitalize;
+}
+.page-sub {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.topbar .crumb {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.card-head h3 {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.table th {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+}
+
+.field label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.stat .k {
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+}
+.stat .v {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-variation-settings: normal;
+}
+
+.badge { letter-spacing: 0.05em; }
+.chip { letter-spacing: 0.03em; }
+
+.fb-tag { font-family: var(--font-body); font-size: 0.66rem; letter-spacing: 0.05em; }
+.fb-reset { font-family: var(--font-body); font-size: 0.7rem; letter-spacing: 0.03em; text-transform: none; }
+
+.side-label { letter-spacing: 0.12em; font-size: 0.58rem; }
+.tb-role { letter-spacing: 0.05em; }
+.sub-head { font-family: var(--font-body); font-size: 0.66rem; letter-spacing: 0.06em; }
+
+.nav-group summary {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.report-sub {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.ride-detail .k { font-family: var(--font-body); font-size: 0.64rem; letter-spacing: 0.05em; }
+
+.perm-title { font-size: 0.76rem; letter-spacing: 0.03em; }
+.perm-all { letter-spacing: 0.05em; }
+.perm-count { font-family: var(--font-body); font-weight: 700; }
+
+.brand-card h3 { font-family: var(--font-body); font-weight: 700; letter-spacing: 0.02em; text-transform: capitalize; }
+.brand-card .seg { letter-spacing: 0.08em; }
+
+.empty .big { font-family: var(--font-body); font-weight: 700; text-transform: none; }
+
+.lang-tab { font-family: var(--font-body); font-size: 0.72rem; letter-spacing: 0.04em; }
+.g-del, .g-cover, .g-tag-new { letter-spacing: 0.08em; }
+.cc-empty, .img-none, .thumb-ph, .ride-bike-empty { letter-spacing: 0.08em; }
+.loader-text, .done-fail { letter-spacing: 0.06em; }
+
+/* round brand markers instead of diamonds */
+.dot { transform: none; border-radius: 50%; }
+
+/* ---------- Pager (custom view, replaces Tailwind markup) ---------- */
+
+.pagination-bar { font-family: var(--font-body); font-size: 0.72rem; letter-spacing: 0.03em; text-transform: none; }
+.pg { display: flex; align-items: center; gap: 0.3rem; }
+.pg-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.9rem; height: 1.9rem; padding: 0 0.45rem;
+  border-radius: 6px; border: 1px solid var(--hairline);
+  background: var(--coal); color: var(--smoke);
+  font-size: 0.74rem; font-weight: 500;
+  transition: color .15s, border-color .15s, background-color .15s;
+}
+a.pg-btn:hover { color: var(--bone); border-color: rgba(237,234,228,0.35); }
+.pg-btn.current {
+  background: rgba(225,6,0,0.14); border-color: rgba(225,6,0,0.4);
+  color: var(--bone); font-weight: 600;
+}
+.pg-btn.disabled { opacity: 0.35; border-color: var(--line); background: transparent; }

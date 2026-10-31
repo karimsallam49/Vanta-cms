@@ -244,7 +244,7 @@ class SiteContent
             $rules[$name] = match ($type) {
                 'text' => ['nullable', 'string', 'max:255'],
                 'textarea', 'lines' => ['nullable', 'string', 'max:4000'],
-                'image' => ['nullable', 'image', 'max:6144'],
+                'image' => ['nullable', 'mimes:jpg,jpeg,png,webp,avif', 'max:6144'],
                 'color' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
             };
             if (self::localizable($type)) {

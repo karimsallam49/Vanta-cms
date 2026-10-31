@@ -144,6 +144,23 @@
           <input class="input" id="top_speed_kmh" name="top_speed_kmh" type="number" min="0" value="{{ old('top_speed_kmh', $motorcycle->top_speed_kmh) }}">
           @error('top_speed_kmh')<span class="err">{{ $message }}</span>@enderror
         </div>
+
+        <div class="field full {{ $errors->has('specs') ? 'has-error' : '' }}" style="margin-top:0.8rem">
+          <label for="specs_text">CUSTOM SPEC TABLE</label>
+          <textarea class="input" id="specs_text" name="specs_text" rows="4" maxlength="2000"
+            placeholder="ENGINE | 998 CC INLINE-4&#10;POWER | 212 HP @ 13,500&#10;TORQUE | 113 NM">{{ old('specs_text', collect($motorcycle->specs ?? [])->map(fn ($s) => ($s['label'] ?? '').' | '.($s['value'] ?? ''))->implode("\n")) }}</textarea>
+          <span class="hint">One spec per line — <strong>LABEL | VALUE</strong>. Overrides the four numeric fields on the site when filled.</span>
+          @error('specs')<span class="err">{{ $message }}</span>@enderror
+        </div>
+
+        <div class="field full {{ $errors->has('features') ? 'has-error' : '' }}">
+          <label for="features_text">FEATURE TAGS</label>
+          <input class="input" id="features_text" name="features_text" maxlength="500"
+            placeholder="AERO WINGLETS, 6-AXIS IMU, LAUNCH CONTROL"
+            value="{{ old('features_text', collect($motorcycle->features ?? [])->implode(', ')) }}">
+          <span class="hint">Comma-separated — rendered as [TAG] chips under the spec table.</span>
+          @error('features')<span class="err">{{ $message }}</span>@enderror
+        </div>
       </div>
     </div>
 

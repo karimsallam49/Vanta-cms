@@ -10,6 +10,7 @@ use App\Models\Motorcycle;
 use App\Models\Offer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class OfferController extends Controller
@@ -51,7 +52,12 @@ class OfferController extends Controller
     {
         $this->authorize('create', Offer::class);
 
-        Offer::create($request->validated());
+        $data = $request->safe()->except(['image', 'remove_image']);
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('offers', 'public');
+        }
+
+        Offer::create($data);
 
         return redirect()->route('admin.offers.index')
             ->with('flash', ['type' => 'success', 'message' => 'Offer created.']);
@@ -73,7 +79,16 @@ class OfferController extends Controller
     {
         $this->authorize('update', $offer);
 
-        $offer->update($request->validated());
+        $data = $request->safe()->except(['image', 'remove_image']);
+        if ($request->hasFile('image')) {
+            $this->deleteImageFile($offer);
+            $data['image'] = $request->file('image')->store('offers', 'public');
+        } elseif ($request->boolean('remove_image')) {
+            $this->deleteImageFile($offer);
+            $data['image'] = null;
+        }
+
+        $offer->update($data);
 
         return redirect()->route('admin.offers.index')
             ->with('flash', ['type' => 'success', 'message' => 'Offer updated.']);
@@ -98,5 +113,12 @@ class OfferController extends Controller
     private function manageableMotorcycles($user)
     {
         return Motorcycle::visibleTo($user)->with('brand')->orderBy('name')->get();
+    }
+
+    private function deleteImageFile(Offer $offer): void
+    {
+        if ($offer->image && ! str_starts_with($offer->image, 'http')) {
+            Storage::disk('public')->delete($offer->image);
+        }
     }
 }

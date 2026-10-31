@@ -31,6 +31,21 @@ class MotorcycleRequest extends FormRequest
 
         // Unchecked checkboxes never reach the request — normalize them.
         $this->merge(['is_active' => $this->boolean('is_active')]);
+
+        // The form ships the spec table as "LABEL | VALUE" lines and feature
+        // tags as a comma list — parse both into the JSON arrays the model stores.
+        if ($this->has('specs_text')) {
+            $this->merge(['specs' => collect(preg_split('/\r\n|\r|\n/', (string) $this->input('specs_text')))
+                ->map(fn ($line) => array_map('trim', explode('|', $line, 2)))
+                ->filter(fn ($p) => count($p) === 2 && $p[0] !== '' && $p[1] !== '')
+                ->map(fn ($p) => ['label' => mb_strtoupper($p[0]), 'value' => mb_strtoupper($p[1])])
+                ->values()->all() ?: null]);
+        }
+        if ($this->has('features_text')) {
+            $this->merge(['features' => collect(preg_split('/[,،]/', (string) $this->input('features_text')))
+                ->map(fn ($f) => mb_strtoupper(trim($f)))
+                ->filter()->values()->all() ?: null]);
+        }
     }
 
     public function rules(): array
@@ -56,6 +71,13 @@ class MotorcycleRequest extends FormRequest
             'power_hp' => ['nullable', 'integer', 'min:0', 'max:1000'],
             'weight_kg' => ['nullable', 'integer', 'min:0', 'max:1000'],
             'top_speed_kmh' => ['nullable', 'integer', 'min:0', 'max:500'],
+            'specs_text' => ['nullable', 'string', 'max:2000'],
+            'specs' => ['nullable', 'array', 'max:12'],
+            'specs.*.label' => ['required_with:specs', 'string', 'max:40'],
+            'specs.*.value' => ['required_with:specs', 'string', 'max:80'],
+            'features_text' => ['nullable', 'string', 'max:500'],
+            'features' => ['nullable', 'array', 'max:12'],
+            'features.*' => ['string', 'max:60'],
             'tagline' => ['nullable', 'string', 'max:160'],
             'tagline_ar' => ['nullable', 'string', 'max:160'],
             'image' => ['nullable', 'url', 'max:500'],
@@ -70,7 +92,7 @@ class MotorcycleRequest extends FormRequest
             'images.*.delete' => ['nullable', 'boolean'],
             // New uploads — nested file + meta per tile.
             'new_images' => ['nullable', 'array', 'max:12'],
-            'new_images.*.file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,avif', 'max:6144'],
+            'new_images.*.file' => ['nullable', 'mimes:jpg,jpeg,png,webp,avif', 'max:6144'],
             'new_images.*.color_name' => ['nullable', 'string', 'max:60'],
             'new_images.*.color_hex' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
             'new_images.*.sort' => ['nullable', 'integer', 'min:0', 'max:500'],

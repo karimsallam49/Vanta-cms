@@ -95,12 +95,19 @@ Route::get('motorcycles', function () {
                     'image' => null,
                 ]))
                 ->unique('hex')->values(),
-            'specs' => array_values(array_filter([
-                $m->engine_cc ? ['label' => 'ENGINE', 'value' => $m->engine_cc.' CC'] : null,
-                $m->power_hp ? ['label' => 'POWER', 'value' => $m->power_hp.' HP'] : null,
-                $m->weight_kg ? ['label' => 'WEIGHT', 'value' => $m->weight_kg.' KG'] : null,
-                $m->top_speed_kmh ? ['label' => 'TOP SPEED', 'value' => $m->top_speed_kmh.' KM/H'] : null,
-            ])),
+            // Custom spec table wins; the four numeric columns are the
+            // fallback for rows that never filled one in.
+            'specs' => collect($m->specs ?? [])
+                ->map(fn ($s) => ['label' => $s['label'] ?? '', 'value' => $s['value'] ?? ''])
+                ->filter(fn ($s) => $s['label'] !== '' && $s['value'] !== '')
+                ->values()->all()
+                ?: array_values(array_filter([
+                    $m->engine_cc ? ['label' => 'ENGINE', 'value' => $m->engine_cc.' CC'] : null,
+                    $m->power_hp ? ['label' => 'POWER', 'value' => $m->power_hp.' HP'] : null,
+                    $m->weight_kg ? ['label' => 'WEIGHT', 'value' => $m->weight_kg.' KG'] : null,
+                    $m->top_speed_kmh ? ['label' => 'TOP SPEED', 'value' => $m->top_speed_kmh.' KM/H'] : null,
+                ])),
+            'features' => array_values($m->features ?? []),
             'showroomIds' => $m->showrooms->pluck('id')->map(fn ($id) => (string) $id)->values(),
         ]),
     ]);
@@ -115,6 +122,7 @@ Route::get('offers', function () {
             'title' => $o->title,
             'description' => $o->description,
             'badge' => $o->badge,
+            'image' => $o->imageUrl(),
             'discountPercent' => $o->discount_percent,
             'scope' => $o->scope->value,
             'target' => $o->targetName(),

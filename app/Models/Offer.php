@@ -7,6 +7,7 @@ use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Offer extends Model
 {
@@ -18,6 +19,7 @@ class Offer extends Model
         'motorcycle_id',
         'title',
         'description',
+        'image',
         'badge',
         'discount_percent',
         'expires_on',
@@ -42,6 +44,30 @@ class Offer extends Model
     public function motorcycle(): BelongsTo
     {
         return $this->belongsTo(Motorcycle::class);
+    }
+
+    /**
+     * External URLs pass through untouched; uploaded files resolve
+     * through the public disk.
+     */
+    public function imageUrl(): ?string
+    {
+        if (! $this->image) {
+            return null;
+        }
+
+        return str_starts_with($this->image, 'http')
+            ? $this->image
+            : Storage::disk('public')->url($this->image);
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Offer $offer) {
+            if ($offer->image && ! str_starts_with($offer->image, 'http')) {
+                Storage::disk('public')->delete($offer->image);
+            }
+        });
     }
 
     /**
