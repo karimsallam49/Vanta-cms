@@ -60,8 +60,8 @@ Open http://127.0.0.1:8000 → redirects to `/admin` → login screen.
   templates, preview-before-commit and row-level results
 - **Test rides inbox** — status pipeline (`pending → contacted → confirmed →
   completed | cancelled`), per-request detail page with activity timeline,
-  live pending badge in the sidebar (polled), automatic customer email on
-  status change
+  automatic customer email on status change. The sidebar pending-count badge
+  polls every 30 s — new website bookings surface without a page refresh
 - **Website content** — 17 editable page sections (hero, headings, worlds,
   service cards, test-ride CTA, footer) with bilingual fields + images,
   served through `/api/sections`
